@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Node structure for circular linked list
+typedef struct Node {
+    int data;
+    struct Node* next;
+} Node;
+
+// Function to create circular linked list of n nodes
+Node* createCircularList(int n) {
+    Node *head = NULL, *temp = NULL, *prev = NULL;
+    for (int i = 1; i <= n; i++) {
+        temp = (Node*)malloc(sizeof(Node));
+        temp->data = i;
+        if (head == NULL)
+            head = temp;
+        else
+            prev->next = temp;
+        prev = temp;
+    }
+    prev->next = head; // make it circular
+    return head;
+}
+
+// Function to solve Josephus Problem
+int josephus(int n, int k) {
+    Node *head = createCircularList(n);
+    Node *prev = NULL, *ptr = head;
+
+    while (ptr->next != ptr) { // until only one node is left
+        for (int count = 1; count < k; count++) {
+            prev = ptr;
+            ptr = ptr->next;
+        }
+        // remove kth node
+        prev->next = ptr->next;
+        printf("Eliminated: %d\n", ptr->data);
+        free(ptr);
+        ptr = prev->next;
+    }
+    int survivor = ptr->data;
+    free(ptr);
+    return survivor;
+}
+
+int main() {
+    FILE *fp;
+    int n, k;
+
+    // Read input from file
+    fp = fopen("input.txt", "r");
+    if (fp == NULL) {
+        printf("Error opening file!\n");
+        return 1;
+    }
+
+    fscanf(fp, "%d %d", &n, &k);
+    fclose(fp);
+
+    printf("Number of people: %d\n", n);
+    printf("Step size (k): %d\n", k);
+
+    int survivor = josephus(n, k);
+    printf("Survivor: %d\n", survivor);
+
+    return 0;
+}
